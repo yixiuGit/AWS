@@ -1,0 +1,10 @@
+Resources:
+  MyFirstInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      AvailabilityZone: ap-southeast-2a
+      ImageId: ami-0567f647e75c7bc05
+      KeyName: chunAWS
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - sg-03cc9db146cf9ca26
