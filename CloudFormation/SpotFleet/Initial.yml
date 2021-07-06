@@ -1,0 +1,11 @@
+Resources:
+  SpotFleet:
+    Type: AWS::EC2::SpotFleet
+    Properties:
+      SpotFleetRequestConfigData:
+        IamFleetRole: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-ec2-spot-fleet-tagging-role
+        TargetCapacity: 2
+        LaunchSpecifications:
+        - ImageId: ami-0567f647e75c7bc05
+          InstanceType: t2.micro
+          WeightedCapacity: 2
