@@ -1,10 +1,26 @@
+Parameters:
+  AvailabilityZone:
+    Type: String
+    Default: ap-southeast-2a
+  AMI:
+    Type: String
+    Default: ami-0567f647e75c7bc05
+  InstanceType:
+    Type: String
+    Default: t2.micro
+  KeyName:
+    Type: String
 Resources:
   MyFirstInstance:
     Type: 'AWS::EC2::Instance'
     Properties:
-      AvailabilityZone: ap-southeast-2a
-      ImageId: ami-0567f647e75c7bc05
-      KeyName: chunAWS
-      InstanceType: t2.micro
+      AvailabilityZone: !Ref AvailabilityZone
+      ImageId: !Ref AMI
+      KeyName: !Ref KeyName
+      InstanceType: !Ref InstanceType
       SecurityGroupIds:
         - sg-03cc9db146cf9ca26
+      BlockDeviceMappings:  # Not required to define root volume if you want default setting
+        - DeviceName: /dev/sdb
+          Ebs:
+            VolumeSize: 8
