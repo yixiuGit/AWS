@@ -51,6 +51,19 @@ Resources:
                 - !GetAtt mySG.GroupId
               AssociatePublicIpAddress: true
               DeleteOnTermination: true
+        - ImageId: ami-05064bb33b40c33a2
+          InstanceType: t2.micro
+          Placement:
+            AvailabilityZone: !Select [ 1, !GetAZs ]
+          Monitoring:
+            Enabled: true
+          NetworkInterfaces:
+            - DeviceIndex: 0
+              SubnetId: !Ref PublicSubnetB
+              Groups:
+                - !GetAtt mySG.GroupId
+              AssociatePublicIpAddress: true
+              DeleteOnTermination: true
   myVPC:
       Type: AWS::EC2::VPC
       Properties:
