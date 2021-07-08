@@ -1,0 +1,27 @@
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+Resources:
+  MyEC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-05064bb33b40c33a2
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        Monitoring:
+          Enabled: true
+        SecurityGroups: # for default VPC, need to use SecurityGroupIds if use customized VPC
+          - sg-10e0cc5e
+        DisableApiTermination: true
+        InstanceInitiatedShutdownBehavior: terminate
+        HibernationOptions:
+          Configured: true
+        BlockDeviceMappings:
+          - Ebs:
+              VolumeSize: 8
+              VolumeType: gp2
+              DeleteOnTermination: true
+              Encrypted: true
+            DeviceName: /dev/xvdcz
+
