@@ -1,0 +1,44 @@
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  myLaunchTemplateVersionNumber:
+    Type: String
+Resources:
+  MyEC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-05064bb33b40c33a2
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        Monitoring:
+          Enabled: true
+        SecurityGroupIds: # for default VPC, need to use SecurityGroupIds if use customized VPC
+                          # when combine with ASG, it will fail even with default SG when using SecurityGroups
+          - sg-10e0cc5e
+        DisableApiTermination: true
+        InstanceInitiatedShutdownBehavior: terminate
+        HibernationOptions:
+          Configured: true
+        BlockDeviceMappings:
+          - Ebs:
+              VolumeSize: 8
+              VolumeType: gp2
+              DeleteOnTermination: true
+              Encrypted: true    #if hibernation is enabled, encryption has to be enabled
+            # when ami is amazon linux 2, devicename will be /dev/xvda
+            # when ami is ubuntu, devicename need be /dev/sda1 - maybe
+            DeviceName: /dev/xvda
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      MinSize: '1'
+      MaxSize: '3'
+      DesiredCapacity: '3'
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyEC2LaunchTemplate
+        Version: !GetAtt MyEC2LaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier:
+        - subnet-ff1ec099
+        - subnet-ff874cb7
+        - subnet-79b2fb21
