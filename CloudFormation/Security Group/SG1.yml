@@ -1,1 +1,20 @@
+Parameters:
+  myVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Specify VPC ID for the security group
 Resources:
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+        GroupName: allow8000
+        GroupDescription: Allow 80 8000 to client host
+        VpcId: !Ref myVPC
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
