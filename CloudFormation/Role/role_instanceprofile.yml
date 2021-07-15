@@ -1,0 +1,37 @@
+Resources:
+  EC2AccessS3:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2-Access-S3
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole   #no space between sts: and AssumeRole,or will have format error
+      Path: /
+  AccessS3Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: AccessS3Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource:
+              - arn:aws:s3:::mybucket/*
+              - arn:aws:s3:::mybucket
+      Roles:
+        - !Ref EC2AccessS3
+  Ec2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: ec2-instance-profile
+      Path: /
+      Roles:
+        - !Ref EC2AccessS3
