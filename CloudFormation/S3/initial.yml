@@ -1,0 +1,86 @@
+Parameters:
+  Version:
+    Type: String
+    AllowedValues:
+      - Enabled
+      - Suspended
+    Default: Enabled
+    Description: Enable Version on bucket
+  ExpiredObjectDeleteMarker:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+    Default: true
+  BlockPublicAcls:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+    Default: true
+  BlockPublicPolicy:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+    Default: true
+  IgnorePublicAcls:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+    Default: true
+  RestrictPublicBuckets:
+    Type: String
+    AllowedValues:
+      - True
+      - False
+    Default: true
+
+
+Resources:
+  mybucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: myphotobeach
+      VersioningConfiguration:
+        Status: !Ref Version
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: !Ref BlockPublicAcls
+        BlockPublicPolicy: !Ref BlockPublicPolicy
+        IgnorePublicAcls: !Ref IgnorePublicAcls
+        RestrictPublicBuckets: !Ref RestrictPublicBuckets
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: testing-logs
+      LifecycleConfiguration:
+        Rules:
+          - Id: IARule
+            Prefix: IA
+            Status: Enabled
+            ExpirationInDays: 365
+            NoncurrentVersionTransition:
+              TransitionInDays: 30
+              StorageClass: STANDARD_IA
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 2
+            # cannot stay with expirationindays, expirationdatae and tagfilters
+            #ExpiredObjectDeleteMarker: !Ref ExpiredObjectDeleteMarker
+          - Id: GlacierRule
+            Prefix: Glacier
+            Status: Disabled
+            ExpirationInDays: 365
+            Transitions:
+              - TransitionInDays: 60
+                StorageClass: GLACIER
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: loggingbucketformyawstest
+      AccessControl: LogDeliveryWrite
+        # enable version, enable publicaccess blocking
+        # lifecycle configuration
+        # logging(server access logging)
