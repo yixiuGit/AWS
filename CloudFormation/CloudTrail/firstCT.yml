@@ -1,0 +1,49 @@
+Resources:
+  myTrail:
+    DependsOn:
+      - BucketPolicy
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsLogging: true
+      IsMultiRegionTrail: true
+      TrailName: testtrail
+      S3BucketName: !Ref S3forCloudTrail
+      EventSelectors:
+        - DataResources:
+            - Type: AWS::S3::Object
+              Values:
+                - "arn:aws:s3:::"
+          IncludeManagementEvents: true
+          ReadWriteType: WriteOnly
+  S3forCloudTrail:
+    Type: AWS::S3::Bucket
+    Properties: {}
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3forCloudTrail
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource:
+              !GetAtt S3forCloudTrail.Arn
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource:
+              !Join
+              - ""
+              - - !GetAtt S3forCloudTrail.Arn
+                - "/AWSLogs/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
