@@ -1,0 +1,9 @@
+Resources:
+  mySNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: testsns
+      FifoTopic: false
+      Subscription:
+        - Endpoint: example@example.com
+          Protocol: email
