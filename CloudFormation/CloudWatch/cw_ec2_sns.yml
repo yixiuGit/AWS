@@ -1,0 +1,56 @@
+Parameters:
+  snsemail:
+    Type: String
+    AllowedPattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+    ConstraintDescription: need to contain @
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  AvailabilityZone:
+    Type: String
+    Default: ap-southeast-2a
+Resources:
+  mySNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: testsns
+      FifoTopic: false
+      Subscription:
+        - Endpoint: !Ref snsemail
+          Protocol: email
+  MyEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZone
+      ImageId: ami-05064bb33b40c33a2
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      Monitoring: false
+      SecurityGroupIds: # for default VPC, need to use SecurityGroupIds if use customized VPC
+        - sg-10e0cc5e
+      DisableApiTermination: false  #for cloudformation testing purpose, leave this as false that CF can delete it
+      InstanceInitiatedShutdownBehavior: terminate
+#      HibernationOptions:
+#        Configured: true
+      BlockDeviceMappings:
+        - Ebs:
+            VolumeSize: 8
+            VolumeType: gp2
+            DeleteOnTermination: true
+            Encrypted: true
+          DeviceName: /dev/xvdcz
+  myCloudWatch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: CPU usage over 90%
+      AlarmActions:
+        - !Ref mySNS
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 90
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref MyEC2
