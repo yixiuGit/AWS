@@ -15,3 +15,14 @@
 - create 2 application load balancer, one for public, one for private
 - launch 4 EC2 instances, one for each subnet
 - the load balancers do health check for each EC2
+
+# Tricks
+
+### EC2 launch template
+- always use SecurityGroupIds instead of SecurityGroups
+- when enable hibration, have to enable encryption as well
+- Amazon linux 2 ebs devicename is /dev/xvba
+- Amazon ubuntu devicename is /dev/sda
+### EC2 instance profile
+- when you create role to allow ec2 access s3 and assign the role to instance profile then associate the instance profile to EC2
+  when try to install package on the EC2 using yum, it trys to install package from S3 which will fail the process
