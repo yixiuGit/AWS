@@ -1,0 +1,31 @@
+Parameters:
+  myVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Specify VPC ID for the security group
+  sgName:
+    Type: String
+    Description: Security Group Name
+  sgDescription:
+    Type: String
+    Description: Describe what does the security group for
+Resources:
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+        GroupName: !Ref sgName
+        GroupDescription: !Ref sgDescription
+        VpcId: !Ref myVPC
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
+Outputs:
+  StackSecurityGroup:                    #logical name for the output
+    Value: !Ref HTTPSecurityGroup        #return SG id for HTTPSecurityGroup
+    Export:
+      Name: InternetSG                   #export the SG ID as InternetSG which can be reference in other stack
